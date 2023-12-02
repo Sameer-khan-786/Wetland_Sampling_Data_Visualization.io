@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Soil Data Scatter Plot</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+    <select id="parameter-select">
+        <option value="TN">TN</option>
+        <option value="TP">TP</option>
+        <option value="m3.P">m3.P</option>
+        <option value="m3.Fe">Fe</option>
+        <option value="m3.Al">Al</option>
+        <option value="wEX.P">wEX.P</option>
+        <option value="wEX.NH3">NH3</option>
+        <option value="wEX.NOx">NOx</option>
+        <option value="pH">pH</option>
+        <option value="EC">EC</option>
+        <option value="SPSC">SPSC</option>
+    </select>
+
+    <div id="scatter-plot"></div>
+
+    
+    <div id="range-selector">
+        <div>
+            <label for="start-date-slider">Start Date:</label>
+            <input type="range" id="start-date-slider">
+            <p id="start-date-label"></p>
+        </div>
+        <div>
+            <label for="end-date-slider">End Date:</label>
+            <input type="range" id="end-date-slider">
+            <p id="end-date-label"></p>
+        </div>
+
+    </div>
+
+    
+    <div id="range-buttons">
+    <button id="btn-1y">1 Year</button>
+    <button id="btn-2y">2 Years</button>
+    <button id="btn-all">All</button>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
