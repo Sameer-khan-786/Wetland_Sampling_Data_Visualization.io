@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Water Data Scatter Plot</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    
+</head>
+<body>
+    
+    <select id="parameter-select">
+        <option value="TN">TN</option>
+    <option value="TP">TP</option>
+    <option value="disNH4">disNH4</option>
+    <option value="disNO3">disNO3</option>
+    <option value="disPO4">disPO4</option>
+    <option value="TDN">TDN</option>
+    <option value="TDP">TDP</option>
+    <option value="Pool Volume (cu ft)">Pool Volume (cu ft)</option>
+    </select>
+
+    <div id="scatter-plot"></div>
+
+    
+    <div id="range-selector">
+        <div>
+            <label for="start-date-slider">Start Date:</label>
+            <input type="range" id="start-date-slider">
+            <p id="start-date-label"></p>
+        </div>
+        <div>
+            <label for="end-date-slider">End Date:</label>
+            <input type="range" id="end-date-slider">
+            <p id="end-date-label"></p>
+        </div>
+
+    </div>
+
+    
+    <div id="range-buttons">
+    <button id="btn-1y">1 Year</button>
+    <button id="btn-2y">2 Years</button>
+    <button id="btn-all">All</button>
+    </div>
+    
+    
+    
+    
+
+    <script src="script1.js"></script>
+</body>
+</html>
