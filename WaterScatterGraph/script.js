@@ -14,10 +14,22 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
     
     const locationSelect = d3.select("#location-select");
     uniqueLocations.forEach(loc => {
-        locationSelect.append("option").text(loc).attr("value", loc);
+        locationSelect.append("option")
+            .text(loc)
+            .attr("value", loc)
+            
+
     });
 
     function createGraph(parameter, parameter2, location) {
+
+        
+
+        parameterSelect = d3.select("#parameter-select");
+          
+
+        parameter2Select = d3.select("#parameter2-select");
+            
         
         d3.select("#my_dataviz").html("");
 
@@ -26,16 +38,16 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
         const parameterData2 = flattenedData.filter(d => d[parameter2] != null && d.locName === location);
 
         
-        const margin = {top: 10, right: 20, bottom: 50, left: 60},
-              width = 960 - margin.left - margin.right,
-              height = 500 - margin.top - margin.bottom;
+        const margin = {top: 10, right: 60, bottom: 40, left: 60},
+              width = 1450 - margin.left - margin.right,
+              height = 520 - margin.top - margin.bottom;
 
         
         const svg = d3.select("#my_dataviz")
                       .append("svg")
                       .attr("width", width + margin.left + margin.right)
                       .attr("height", height + margin.top + margin.bottom)
-                      .style("background-color", "lightblue")
+                      .style("background-color", "rgb(230, 240, 240)")
                       .append("g")
                       .attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -49,9 +61,12 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
 
         
         svg.append("text")             
-           .attr("transform", `translate(${width / 2}, ${height + margin.top + 20})`)
+           .attr("transform", `translate(${width / 2}, ${height + margin.top + 25})`)
            .style("text-anchor", "middle")
-           .text("Date");
+           .text("Date")
+           .style("fill", "black")
+           .style("font-size", "24px")
+           .style("font-weight", "bold");
 
         
         const y = d3.scaleLinear()
@@ -60,14 +75,38 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
         svg.append("g")
            .call(d3.axisLeft(y));
 
+        //creating second scale for second y axis 
+        const y2 = d3.scaleLinear()
+            .domain([0, d3.max(flattenedData, function(d) { return d[parameter2]; })])
+                    .range([height, 0]);
+
+        // Append the second y-axis to the right
+        svg.append("g")
+           .attr("transform", `translate(${width}, 0)`)
+           .call(d3.axisRight(y2));
+
         
         svg.append("text")
            .attr("transform", "rotate(-90)")
-           .attr("y", 0 - margin.left)
+           .attr("y", 0 - margin.left - 5)
            .attr("x",0 - (height / 2))
            .attr("dy", "1em")
            .style("text-anchor", "middle")
-           .text("Value");
+           .text(`${parameter}`)
+           .style("fill", "darkblue")
+           .style("font-size", "24px")
+           .style("font-weight", "bold");
+
+           svg.append("text")
+           .attr("transform", "rotate(-90)")
+           .attr("y", width - margin.right + 95)
+           .attr("x",0 - (height / 2))
+           .attr("dy", "1em")
+           .style("text-anchor", "middle")
+           .text(`${parameter2}`)
+           .style("fill", "red")
+           .style("font-size", "24px")
+           .style("font-weight", "bold");
 
         
         const line1 = d3.line()
@@ -78,31 +117,60 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
         const line2 = d3.line()
                        .defined(d => d[parameter2] != null) 
                        .x(function(d) { return x(d.date); })
-                       .y(function(d) { return y(d[parameter2]); });
+                       .y(function(d) { return y2(d[parameter2]); });
 
         
         svg.append("path")
            .datum(parameterData)
            .attr("fill", "none")
-           .attr("stroke", "steelblue")
-           .attr("stroke-width", 1.5)
+           .attr("stroke", "darkblue")
+           .attr("stroke-width", 10)
+           .attr("stroke-opacity", 0.8)
            .attr("d", line1);
 
         svg.append("path")
            .datum(parameterData2)
            .attr("fill", "none")
-           .attr("stroke", "green") 
-           .attr("stroke-width", 1.5)
+           .attr("stroke", "red") 
+           .attr("stroke-width", 10)
+           .attr("stroke-opacity", 0.8)
            .attr("d", line2);
 
         
-    d3.select(".tooltip").remove();
+           d3.select(".tooltip").remove();
 
     
-    const tooltip = d3.select("body").append("div") 
-                     .attr("class", "tooltip")       
-                     .style("opacity", 0);
+           const tooltip = d3.select("body").append("div") 
+               .attr("class", "tooltip")
+               .style("position", "absolute")
+               .style("background-color", "white")
+               .style("border", "1px solid black")
+               .style("padding", "5px")
+               .style("opacity", 0);
+       
+       
+               function getTooltipLeftPosition(mouseX) {
+                   const tooltipWidth = parseFloat(tooltip.style("width"));
+                   const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                   const leftPosition = mouseX + tooltipWidth + 10 > windowWidth
+                       ? windowWidth - tooltipWidth - 10  // Adjusted this line
+                       : mouseX + 10;
+                   return leftPosition;
+               }
+               
+               function getTooltipTopPosition(mouseY) {
+                   const tooltipHeight = parseFloat(tooltip.style("height"));
+                   const windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                   const topPosition = mouseY + tooltipHeight + 10 > windowHeight
+                       ? windowHeight - tooltipHeight - 10  // Adjusted this line
+                       : mouseY + 10;
+                   return topPosition;
+               }
 
+
+            selectedParameter = parameter;
+            selectedParameter2 = parameter2;
+            
     
     svg.selectAll(".dot")
    .data(parameterData)
@@ -110,29 +178,23 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
    .attr("class", "dot")
    .attr("cx", function(d) { return x(d.date); })
    .attr("cy", function(d) { return y(d[parameter]); })
-   .attr("r", 5)
+   .attr("r", 10)
+   .attr("fill", "darkblue")
+   .attr("stroke", "white")
+   .attr("stroke-width", 1)
+   .attr("stroke-opacity", 1)
+   .style("stroke-linejoin", "round")
+   .style("stroke-linecap", "round")
    .on("mouseover", function(event, d) {
        tooltip.transition()
               .duration(200)
               .style("opacity", .9);
-       tooltip.html(`sampleMedia: ${d.sampleMedia}<br/>` +
-                `visitDate: ${d.visitDate}<br/>` +
-                `TN: ${d.TN}<br/>` +
-                `TP: ${d.TP}<br/>` +
-                `disNH4: ${d.disNH4}<br/>` +
-                `disNO3: ${d.disNO3}<br/>` +
-                `disPO4: ${d.disPO4}<br/>` +
-                `TDN: ${d.TDN}<br/>` +
-                `TDP: ${d.TDP}<br/>` +
-                `locName: ${d.locName}<br/>` +
-                `Pool Volume (cu ft): ${d['Pool Volume (cu ft)']}<br/>` +
-                `specific_location: ${d.specific_location}<br/>` +
-                `samp_type: ${d.samp_type}<br/>` +
-                `notes: ${d.notes}<br/>` +
-                `samp_notes: ${d.samp_notes}`)
-              .style("left", (event.pageX + 5) + "px")
-              .style("top", (event.pageY - 28) + "px");
-   })
+       tooltip.html(
+                `${selectedParameter}: ${d[selectedParameter]}<br/>`
+                )
+                .style("left", getTooltipLeftPosition(event.pageX) + "px")
+                .style("top", getTooltipTopPosition(event.pageY) + "px");
+        })
        
        .on("mouseout", function(d) {
        tooltip.transition()
@@ -144,25 +206,27 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
        tooltip.transition()
               .duration(200)
               .style("opacity", .9);
-       tooltip.html(`sampleMedia: ${d.sampleMedia}<br/>` +
+       tooltip.html(
+                `${selectedParameter}: ${d[selectedParameter]}<br/>` +
+                //`sampleMedia: ${d.sampleMedia}<br/>` +
                 `visitDate: ${d.visitDate}<br/>` +
-                `TN: ${d.TN}<br/>` +
-                `TP: ${d.TP}<br/>` +
-                `disNH4: ${d.disNH4}<br/>` +
-                `disNO3: ${d.disNO3}<br/>` +
-                `disPO4: ${d.disPO4}<br/>` +
-                `TDN: ${d.TDN}<br/>` +
-                `TDP: ${d.TDP}<br/>` +
+                //`TN: ${d.TN}<br/>` +
+                //`TP: ${d.TP}<br/>` +
+                //`disNH4: ${d.disNH4}<br/>` +
+               // `disNO3: ${d.disNO3}<br/>` +
+               // `disPO4: ${d.disPO4}<br/>` +
+               // `TDN: ${d.TDN}<br/>` +
+                //`TDP: ${d.TDP}<br/>` +
                 `locName: ${d.locName}<br/>` +
                 `Pool Volume (cu ft): ${d['Pool Volume (cu ft)']}<br/>` +
                 `specific_location: ${d.specific_location}<br/>` +
-                `samp_type: ${d.samp_type}<br/>` +
+               // `samp_type: ${d.samp_type}<br/>` +
                 `notes: ${d.notes}<br/>` +
                 `samp_notes: ${d.samp_notes}`)
-              .style("left", (event.pageX + 5) + "px")
-              .style("top", (event.pageY - 28) + "px");
+                .style("left", getTooltipLeftPosition(event.pageX) + "px")
+                .style("top", getTooltipTopPosition(event.pageY) + "px");
 
-       
+       /*
        svg.selectAll(".verticalLine, .dataLabel").remove();
 
        
@@ -184,6 +248,7 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
           .attr("text-anchor", "middle")
           .attr("fill", "black")
           .text(d[parameter]);
+          */
    });
 
    
@@ -192,31 +257,25 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
        .enter().append("circle")
        .attr("class", "dot2")
        .attr("cx", d => x(d.date))
-       .attr("cy", d => y(d[parameter2]))
-       .attr("r", 5)
-       .attr("fill", "green")
+       .attr("cy", d => y2(d[parameter2]))
+       .attr("r", 10)
+        .attr("fill", "red")
+        .attr("stroke", "white")
+        .attr("stroke-width", 1)
+        .attr("stroke-opacity", 1)
+        .style("stroke-linejoin", "round")
+        .style("stroke-linecap", "round")
        .on("mouseover", function(event, d) {
            tooltip.transition()
                   .duration(200)
                   .style("opacity", .9);
-           tooltip.html(`sampleMedia: ${d.sampleMedia}<br/>` +
-                `visitDate: ${d.visitDate}<br/>` +
-                `TN: ${d.TN}<br/>` +
-                `TP: ${d.TP}<br/>` +
-                `disNH4: ${d.disNH4}<br/>` +
-                `disNO3: ${d.disNO3}<br/>` +
-                `disPO4: ${d.disPO4}<br/>` +
-                `TDN: ${d.TDN}<br/>` +
-                `TDP: ${d.TDP}<br/>` +
-                `locName: ${d.locName}<br/>` +
-                `Pool Volume (cu ft): ${d['Pool Volume (cu ft)']}<br/>` +
-                `specific_location: ${d.specific_location}<br/>` +
-                `samp_type: ${d.samp_type}<br/>` +
-                `notes: ${d.notes}<br/>` +
-                `samp_notes: ${d.samp_notes}`)
+           tooltip.html(
+            `${selectedParameter2}: ${d[selectedParameter2]}<br/>` 
+           )
+                
 
-              .style("left", (event.pageX + 5) + "px")
-              .style("top", (event.pageY - 28) + "px");
+                .style("left", getTooltipLeftPosition(event.pageX) + "px")
+                .style("top", getTooltipTopPosition(event.pageY) + "px");
        })
        .on("mouseout", function() {
            tooltip.transition()
@@ -224,8 +283,31 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
                   .style("opacity", 0);
        })
        .on("click", function(event, d) {
+       
+        tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+        tooltip.html(
+                `${selectedParameter2}: ${d[selectedParameter2]}<br/>` +
+                 //`sampleMedia: ${d.sampleMedia}<br/>` +
+                 `visitDate: ${d.visitDate}<br/>` +
+                 //`TN: ${d.TN}<br/>` +
+                // `TP: ${d.TP}<br/>` +
+                // `disNH4: ${d.disNH4}<br/>` +
+                // `disNO3: ${d.disNO3}<br/>` +
+                // `disPO4: ${d.disPO4}<br/>` +
+                // `TDN: ${d.TDN}<br/>` +
+                // `TDP: ${d.TDP}<br/>` +
+                 `locName: ${d.locName}<br/>` +
+                 `Pool Volume (cu ft): ${d['Pool Volume (cu ft)']}<br/>` +
+                 `specific_location: ${d.specific_location}<br/>` +
+                 //`samp_type: ${d.samp_type}<br/>` +
+                 `notes: ${d.notes}<br/>` +
+                 `samp_notes: ${d.samp_notes}`)
+                 .style("left", getTooltipLeftPosition(event.pageX) + "px")
+                 .style("top", getTooltipTopPosition(event.pageY) + "px");
 
-           
+           /*
            svg.selectAll(".verticalLine, .dataLabel").remove();
 
            
@@ -247,7 +329,7 @@ d3.json('final_cleaned_water_data.json').then(function(data) {
               .attr("text-anchor", "middle")
               .attr("fill", "green")
               .text(d[parameter2]);
-
+*/
 
        });
     }

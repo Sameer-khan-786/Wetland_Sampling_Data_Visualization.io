@@ -7,58 +7,92 @@
             display: flex;
             flex-direction: column; /* Stack divs vertically */
             margin: 0;
+            background-color: rgb(69, 80, 69);
         }
-
         #header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px;
-            background-color: lightgray;
+            background-color: rgb(69, 80, 69);
+            
         }
         #title {
             margin-right: 100;
             font-size: 24px;
+            color: white;
         }
         #buttons {
             display: flex;
-            gap: 50px;
-            margin-right: 200px;
+            gap: 20px;
+            margin-right: 100px;
             width: 400px;
         }
         #buttons button {
-            width: 100%;
-            font-size: 42px;
+            width: 200px;
+            height: 50px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
             transition: background-color 0.3s ease;
+            box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.8)
         }
         #buttons button.water{
-            background-color: lightblue;
+            background-color: #3498db;
         }
         #buttons button.soil {
-            background-color: orange;
+            background-color: darkorange; /* Changed to dark orange */
         }
-        #buttons button:hover {
-            background-color: whitesmoke;
+        #buttons button.water:hover {
+            background-color: #2980b9;
         }
+        #buttons button.soil:hover {
+            background-color: rgb(207, 114, 0);
+        }
+        
         #div0 {
-            width: 100%;
-            border: 2px solid black;
-            padding: 10px;
+            width: 55%;
+            border: 1px solid rgb(69, 80, 69);
+            padding: 5px;
             box-sizing: border-box;
-            height: 450px;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgb(193, 206, 193);
+            border-radius: 5px;
         }
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            
+        }
+
         #div1, #div2 {
-            border: 2px solid black;
-            padding: 10px;
-            width: 50%;
+            border: 1px solid rgb(69, 80, 69);
+            padding: 5px;
             box-sizing: border-box;
+            border-radius: 5px;
+            
+        }
+        #div1 {
+            width: 100%;
+            height: 100%;
+            background-color: rgb(193, 206, 193);
+        }
+        #div2 {
+            width:45%;
+            height: 100%;
+            background-color: rgb(193, 206, 193);
         }
         .contentDiv iframe {
             width: 100%;
-            height: 900px;
+            height: 100%;
             border: none;
         }
-        /* Flex container for div1 and div2 */
+        /* Flex container for div0 and div2 */
         .flex-container {
             display: flex;
         }
@@ -66,30 +100,80 @@
         #div_00 {
             text-align: center;
         }
+
+
+        /* General dropdown styling */
+select {
+    width: 200px;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+ /*Hover effect */
+ select:hover {
+    border-color: #888;
+}
+
+/* Focus effect */
+select:focus {
+    box-shadow: 0 0 8px rgba(33, 150, 243, 0.5);
+    border-color: #2196F3;
+}
+
+/* Option styling */
+select option {
+    padding: 10px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+/* Changing the arrow indicator of the dropdown */
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position-x: 95%;
+    background-position-y: 50%;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    select {
+        width: 100%;
+    }
+}
+
     </style>
 </head>
 <body>
-    <div id="div_00">
-        <div id="header">
+    <div id="header">
         <div id="title">
-            <h1>Wetlands Sampling - Chemical Analysis</h1>
+            <h2>Wetlands Sampling - Chemical Analysis</h2>
         </div>
         <div id="buttons">
-                <button class="water" onclick="loadContent('water')">Water</button>
-                <button class="soil" onclick="loadContent('soil')" >Soil</button>
+            <button class="water" onclick="loadContent('water')">Water</button>
+            <button class="soil" onclick="loadContent('soil')">Soil</button>
         </div>
-        </div>
-    </div>
-    <div id="div0" class="contentDiv">
-        <!-- Dynamic content will be loaded here -->
     </div>
     <div class="flex-container">
-        <div id="div1">
-            <div id="contentDiv" class="contentDiv"></div>
+        <div id="div0" class="contentDiv">
+            <!-- Dynamic content will be loaded here -->
         </div>
         <div id="div2">
             <div id="contentDiv2" class="contentDiv"></div>
         </div>
+    </div>
+    <div id="div1">
+        <div id="contentDiv" class="contentDiv"></div>
     </div>
 
     <script>
@@ -100,23 +184,35 @@
 
             // Update content for div0
             if (selectedValue === "soil") {
-                div0.innerHTML = '<iframe src="Map/map_soil.html" style="height: 600px;"></iframe>';
+                div0.innerHTML = '<iframe src="Map/map_soil.html" style="height: 520px;"></iframe>';
             } else if (selectedValue === "water") {
-                div0.innerHTML = '<iframe src="Map/map.html" style="height: 600px;"></iframe>';
+                div0.innerHTML = '<iframe src="Map/map.html" style="height: 520px;"></iframe>';
             }
 
             // Logic for Div1
             if (selectedValue === "soil") {
-                contentDiv1.innerHTML = '<iframe src="SoilScatteGraph/index1.html"></iframe>';
+                contentDiv1.innerHTML = '<iframe src="SoilScatteGraph/index1.html"style="height: 600px"></iframe>';
             } else if (selectedValue === "water") {
-                contentDiv1.innerHTML = '<iframe src="WaterScatterGraph/index.html"></iframe>';
+                contentDiv1.innerHTML = '<iframe src="WaterScatterGraph/index.html"style="height: 600px"></iframe>';
             }
 
             // Logic for Div2
             if (selectedValue === "soil") {
-                contentDiv2.innerHTML = '<iframe src="Scatterplotsoil/index.html"></iframe>';
+                contentDiv2.innerHTML = '<iframe src="Scatterplotsoil/index.html" style="height: 520px"></iframe>';
             } else if (selectedValue === "water") {
-                contentDiv2.innerHTML = '<iframe src="ScatterPlotWater/index1.html"></iframe>';
+                contentDiv2.innerHTML = '<iframe src="ScatterPlotWater/index1.html" style="height: 520px"></iframe>';
+            }
+            
+            // Highlight the clicked button and unhighlight the other
+            var waterButton = document.querySelector('.water');
+            var soilButton = document.querySelector('.soil');
+            
+            if (selectedValue === "soil") {
+                soilButton.classList.add('highlight');
+                waterButton.classList.remove('highlight');
+            } else if (selectedValue === "water") {
+                waterButton.classList.add('highlight');
+                soilButton.classList.remove('highlight');
             }
         }
 
@@ -126,6 +222,3 @@
     </script>
 </body>
 </html>
-
-
-
