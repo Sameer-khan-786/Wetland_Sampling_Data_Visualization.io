@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Soil Data Scatter Plot</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        select{width: 200px;
+     padding: 3px;
+     margin-bottom: 2px;
+     border: 1px solid #ddd;
+     border-radius: 1px;
+     background-color: #fff;
+     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+     cursor: pointer;
+     outline: none;
+     transition: all 0.3s ease;
+
+        }
+        /* Hover effect */
+select:hover {
+    border-color: #888;
+}
+
+/* Focus effect */
+select:focus {
+    box-shadow: 0 0 8px rgba(33, 150, 243, 0.5);
+    border-color: #2196F3;
+}
+
+/* Option styling */
+select option {
+    padding: 5px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+/* Changing the arrow indicator of the dropdown */
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position-x: 95%;
+    background-position-y: 50%;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    select {
+        width: 100%;
+    }
+}
+
+#range_container {
+    display: flex;           /* Enable Flexbox */
+    align-items: center;     /* Align items vertically in the center */
+    justify-content: space-between; /* Space out the child elements */
+    margin: 10px;
+}
+
+#range-selector {
+    display: flex;
+    flex: 0;
+}
+#range-selector div {
+    margin-right: 10px; /* Add margin between slider elements */
+    width: 160px;
+}
+
+#range-buttons {
+    margin-right: 5%;
+}
+    
+
+     </style>
+</head>
+<body>
+    <select id="parameter-select">
+        <option value="TN">TN</option>
+        <option value="TP">TP</option>
+        <option value="m3.P">m3.P</option>
+        <option value="m3.Fe">Fe</option>
+        <option value="m3.Al">Al</option>
+        <option value="wEX.P">wEX.P</option>
+        <option value="wEX.NH3">NH3</option>
+        <option value="wEX.NOx">NOx</option>
+        <option value="pH">pH</option>
+        <option value="EC">EC</option>
+        <option value="SPSC">SPSC</option>
+    </select>
+
+    <div id="scatter-plot"></div>
+
+    <div id="range_container">
+    <div id="range-selector">
+        <div>
+            <label for="start-date-slider">Start Date:</label>
+            <input type="range" id="start-date-slider">
+            <p id="start-date-label"></p>
+        </div>
+        <div>
+            <label for="end-date-slider">End Date:</label>
+            <input type="range" id="end-date-slider">
+            <p id="end-date-label"></p>
+        </div>
+
+    </div>
+
+    
+    <div id="range-buttons">
+    <button id="btn-1y">1 Year</button>
+    <button id="btn-2y">2 Years</button>
+    <button id="btn-all">All</button>
+    </div>
+
+</div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

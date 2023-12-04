@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>D3 Line Graph Visualization</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        select{width: 200px;
+     padding: 7px;
+     margin-bottom: 5px;
+     border: 1px solid #ddd;
+     border-radius: 5px;
+     background-color: #fff;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     cursor: pointer;
+     outline: none;
+     transition: all 0.3s ease;
+     /* Hover effect */
+select:hover {
+    border-color: #888;
+}
+
+/* Focus effect */
+select:focus {
+    box-shadow: 0 0 8px rgba(33, 150, 243, 0.5);
+    border-color: #2196F3;
+}
+
+/* Option styling */
+select option {
+    padding: 10px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+/* Changing the arrow indicator of the dropdown */
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position-x: 95%;
+    background-position-y: 50%;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    select {
+        width: 100%;
+    }
+}
+        }
+     </style>
+</head>
+<body>
+
+<select id="location-select"></select>
+  
+<select id="parameter-select">
+    <option value="TN">TN</option>
+    <option value="TP">TP</option>
+    <option value="disNH4">disNH4</option>
+    <option value="disNO3">disNO3</option>
+    <option value="disPO4">disPO4</option>
+    <option value="TDN">TDN</option>
+    <option value="TDP">TDP</option>
+    <option value="Pool Volume (cu ft)">Pool Volume (cu ft)</option>
+</select>
+
+<select id="parameter2-select">
+    <option value="TP">TP</option>
+    <option value="TN">TN</option>
+    <option value="disNH4">disNH4</option>
+    <option value="disNO3">disNO3</option>
+    <option value="disPO4">disPO4</option>
+    <option value="TDN">TDN</option>
+    <option value="TDP">TDP</option>
+    <option value="Pool Volume (cu ft)">Pool Volume (cu ft)</option>
+</select>
+<div id="my_dataviz"></div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+

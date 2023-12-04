@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="map.css"> 
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <title>Term Project</title>
+    <style>
+        /* Add your existing styles here */
+        /* Style for the map container */
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 500px; /* Adjust as needed */
+        }
+
+        /* Style for the popup */
+        .popup {
+            position: absolute;
+            top: 2px;
+            left: 2px; /* Move the popup to the top left */
+            background-color: #f2f2f2; /* Light gray background */
+            border: 1px solid #ccc; /* Light gray border */
+            padding: 10px;
+            margin: 10px;
+            z-index: 1000; /* Ensures the popup stays above other elements */
+            display: none; /* Initially hidden */
+            text-align: center; /* Center-align text */
+            border-radius: 5px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Box shadow */
+        }
+
+        /* Style for the dropdown */
+        #dataSwitcher {
+            position: absolute;
+            top: 10px;
+            right: 10px; /* Move the dropdown to the top right */
+            z-index: 1001;
+        }
+        .gm-control-active{
+            display:none !important;
+        }
+        
+        /* Style for different colors in the popup */
+        .param-label {
+            color: #3498db; /* Blue font color */
+            font-weight: bold; /* Bold font */
+        }
+        .param-value {
+            color: #e74c3c; /* Red font color */
+            font-weight: bold; /* Bold font */
+        }
+        .locname {
+            color: #27ae60; /* Green font color for locName */
+            font-weight: bold; /* Bold font */
+            font-size: 18px; /* Larger font size for locName */
+        }
+    </style>
+</head>
+<body>
+ <div class="map-container"> 
+        <div id="Map" class="bottom-left-div"></div>
+        <div class="popup"></div>
+    </div> 
+  
+    <script>
+        let map, waterMarkers = [];
+        let lastClickedMarker = null;
+        const waterParameters = ['TP', 'TN', 'disNH4', 'disNO3', 'disPO4'];
+        
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('Map'), {
+                center: {lat: 41.0235, lng: -83.689000},
+                zoom: 15.9,
+                mapTypeId: 'satellite',
+                gestureHandling: 'none' // Disable zoom by gesture
+            });
+
+            // Load and process CSV data
+            loadCSVData();
+        }
+
+        function processCSVData(data, parameters) {
+            let groupedData = d3.group(data, d => d.locName);
+            let averages = new Map();
+            groupedData.forEach((values, locName) => {
+                let avgCoordinates = {
+                    lat: d3.mean(values, d => +d.y), // Updated to use 'y' for latitude
+                    lng: d3.mean(values, d => +d.x)  // Updated to use 'x' for longitude
+                };
+                let avgParams = {};
+                parameters.forEach(param => {
+                    avgParams[param] = d3.mean(values, d => +d[param]);
+                });
+                averages.set(locName, { coordinates: avgCoordinates, params: avgParams });
+            });
+            return averages;
+        }
+
+        // Updated createMarkers function
+        function createMarkers(dataType, averages) {
+            let iconUrl, clickIconUrl;
+            let markersArray = dataType === 'water' ? waterMarkers : soilMarkers;
+
+            if (dataType === 'water') {
+                iconUrl = 'pin_blue.png';
+                clickIconUrl = 'pin_dark_blue.png'; // Updated highlight icon for water
+            } else {
+                iconUrl = 'pin_yellow.png';
+                clickIconUrl = 'light_orange.png';
+            }
+
+            averages.forEach((data, locName) => {
+                let icon = {
+                    url: iconUrl,
+                    scaledSize: new google.maps.Size(18, 18) // Adjust the size as needed
+                };
+
+                let marker = new google.maps.Marker({
+                    position: data.coordinates,
+                    map: map,
+                    icon: icon,
+                    title: locName,
+                    clickIconUrl: clickIconUrl, // Custom property to store click icon URL
+                    dataType: dataType // Custom property to store data type
+                });
+
+                marker.addListener('click', () => {
+                    showPopup(locName, dataType, data.params);
+                    // Highlight the clicked marker by changing its icon
+                    marker.setIcon({
+                        url: clickIconUrl,
+                        scaledSize: new google.maps.Size(25, 25)
+                    });
+
+                    // Reset the last clicked marker's icon if it exists
+                    if (lastClickedMarker && lastClickedMarker !== marker) {
+                        lastClickedMarker.setIcon({
+                            url: dataType === 'water' ? 'pin_blue.png' : 'pin_yellow.png',
+                            scaledSize: new google.maps.Size(18, 18)
+                        });
+                    }
+
+                    // Set the current marker as the last clicked marker
+                    lastClickedMarker = marker;
+                });
+
+                markersArray.push(marker);
+            });
+        }
+
+        // Function to clear markers
+        function clearMarkers(markersArray) {
+            for (let marker of markersArray) {
+                marker.setMap(null);
+            }
+            markersArray.length = 0; // Clear the array
+        }
+
+        function showPopup(locName, dataType, params) {
+            let popupContent = `<span class="locname">${locName.toUpperCase()}</span><br>`;
+            popupContent += '<div>'; // Container for parameter details
+
+            let paramCount = 0;
+
+            for (let param in params) {
+                if (paramCount % 3 === 0) {
+                    popupContent += '<br>'; // Start a new line for every 3 parameters
+                }
+
+                if (param === 'TP') {
+                    popupContent += `<span class="param-label">Total Phosphorus:</span><span class="param-value"> ${params[param].toFixed(2)}`;
+                } else if (param === 'TN') {
+                    popupContent += `<span class="param-label">Total Nitrogen:</span><span class="param-value"> ${params[param].toFixed(2)}`;
+                } else {
+                    popupContent += `<span class="param-label">${param}:</span> <span class="param-value">${params[param].toFixed(2)}</span>`;
+                }
+
+                if (paramCount < Object.keys(params).length - 1) {
+                    popupContent += ' | '; // Add a separator unless it's the last parameter
+                }
+
+                paramCount++;
+            }
+
+            popupContent += '</div>'; // Close the parameter details container
+
+            let popup = document.querySelector('.popup');
+            popup.innerHTML = popupContent;
+            popup.style.display = 'block';
+        }
+
+        function loadCSVData() {
+            d3.csv("water-samples.csv").then(data => {
+                let waterData = processCSVData(data, waterParameters);
+                // Directly create water markers without checking the dropdown value
+                createMarkers('water', waterData);
+            });
+        }
+
+        function loadGoogleMapsAPI() {
+            var script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyASKCcKQ2u7ycK2WfkffhSWMnNN97prquE&callback=initMap';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+
+        loadGoogleMapsAPI();
+    </script>
+</body>
+</html>
